@@ -11,79 +11,74 @@ public class Solution1 : MonoBehaviour
     public bool isHillDwarf;
     public bool hasToughFeat;
     public bool averageHP;
-    //public int hitDice;
 
-    public int characterHP;
-
-
+    private int characterHP;
 
     private List<string> characterClasses = new List<string>
     {
-        "Artificer", "Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk", "Ranger", "Rogue", "Paladin", "Sorcerer", "Wizard", "Warlock"
-    }
-    ;
+        "Artificer", "Barbarian", "Bard", "Cleric", "Druid", "Fighter", "Monk",
+        "Ranger", "Rogue", "Paladin", "Sorcerer", "Wizard", "Warlock"
+    };
 
     public Dictionary<string, int> hitDice = new Dictionary<string, int>
     {
-        {"Artificer", 8 }, {"Barbarian", 12 }, {"Bard", 8}, {"Cleric", 8}, {"Druid", 8 }, {"Fighter", 10}, {"Monk", 8}, {"Ranger", 10}, {"Rogue", 8}, {"Paladin", 10}, {"Sorcerer", 6}, {"Wizard", 6}, {"Warlock", 8}
-    }
-    ;
+        {"Artificer", 8 }, {"Barbarian", 12 }, {"Bard", 8}, {"Cleric", 8}, {"Druid", 8 },
+        {"Fighter", 10}, {"Monk", 8}, {"Ranger", 10}, {"Rogue", 8}, {"Paladin", 10},
+        {"Sorcerer", 6}, {"Wizard", 6}, {"Warlock", 8}
+    };
 
     private int[] abilityModifiers = new int[]
     {
-        -5, -4, -4, -3, -3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10
-    }
-    ;
+        -5, -4, -4, -3, -3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5,
+        6, 6, 7, 7, 8, 8, 9, 9, 10
+    };
 
-    private void dwarf()
+    private void ApplyDwarfBonus()
     {
         if (isHillDwarf)
         {
             characterHP += characterLevel;
         }
     }
-   
-    private void feat()
+
+    private void ApplyToughFeat()
     {
         if (hasToughFeat)
         {
-                characterHP += characterLevel * 2;
+            characterHP += characterLevel * 2;
         }
     }
-   
-    private void roll()
+
+    private void CalculateHP()
     {
-        int hitDie = hitDice (characterLevel);
-        if (averageHP == false)
+        int hitDie = hitDice[characterClass];
+
+        if (!averageHP) 
         {
             for (int i = 0; i < characterLevel; i++)
             {
-                //averageHP = "Rolled";
-                characterHP += Random.Range(1, hitDice);
+                characterHP += UnityEngine.Random.Range(1, hitDie + 1); 
             }
         }
-        else
+        else 
         {
-            for (int i = 0; i < characterLevel; i++)
-            {
-                //averageHP = "Average";
-                characterHP += (hitDice / 2) + 1 + characterLevel;
-            }
+            characterHP += (hitDie / 2 + 1) * characterLevel; 
         }
     }
 
-
-
-
-// Start is called once before the first execution of Update after the MonoBehaviour is created
-void Start()
+    private void Update()
     {
-        
-    }
+        int conModifier = abilityModifiers[characterConstitution - 1];
+        characterHP = conModifier * characterLevel;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        ApplyDwarfBonus();
+        ApplyToughFeat();
+        CalculateHP();
+
+        Debug.Log($"My character {characterName} is a level {characterLevel} {characterClass} " +
+                  $"with a CON score of {characterConstitution} and {(isHillDwarf ? "is" : "is not")}" +
+                  $"a Hill Dwarf and {(hasToughFeat ? "has" : "does not have")} the Tough feat. " +
+                  $"I want the HP {(averageHP ? "average" : "rolled")}. Your HP is {characterHP}.");
     }
+}
 }
